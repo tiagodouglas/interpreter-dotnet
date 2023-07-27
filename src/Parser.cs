@@ -63,6 +63,9 @@ internal class Parser
         RegisterPrefix(Constants.IF, ParseIfExpression);
         RegisterPrefix(Constants.FUNCTION, ParseFunctionLiteral);
 
+        RegisterInfix(Constants.LPAREN, ParseCallExpression);
+        
+
         NextToken();
         NextToken();
     }
@@ -314,6 +317,43 @@ internal class Parser
         return lit;
     }
 
+    private IExpression ParseCallExpression(IExpression function)
+    {
+        var exp = new CallExpression(CurToken, function);
+        exp.Arguments = ParseCallArguments();
+
+        return exp;
+    }
+
+    private IExpression[] ParseCallArguments()
+    {
+        var args = new IExpression[] { };
+
+        if (PeekTokenIs(Constants.RPAREN))
+        {
+            NextToken();
+            return args;
+        }
+
+        NextToken();
+
+        args.Append(ParseExpression((int)PrecedencesEnum.LOWEST));
+
+        while (PeekTokenIs(Constants.COMMA))
+        {
+            NextToken();
+            NextToken();
+            args.Append(ParseExpression((int)PrecedencesEnum.LOWEST));
+        }
+
+        if (!ExpectPeek(Constants.RPAREN))
+        {
+            return null;
+        }
+
+        return args;
+    }
+
     private Identifier[] ParseFunctionParameters()
     {
         var identifiers = new Identifier[] { };
@@ -345,6 +385,8 @@ internal class Parser
 
         return identifiers;
     }
+
+
 
     private bool CurTokenIs(string tokenType)
     {
