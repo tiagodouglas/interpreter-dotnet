@@ -59,6 +59,8 @@ internal class Parser
         RegisterPrefix(Constants.GT, ParsePrefixExpression);
         RegisterPrefix(Constants.TRUE, ParseBoolean);
         RegisterPrefix(Constants.FALSE, ParseBoolean);
+        RegisterPrefix(Constants.LPAREN, ParseGroupedExpression);
+        RegisterPrefix(Constants.IF, ParseIfExpression);
 
         NextToken();
         NextToken();
@@ -226,6 +228,68 @@ internal class Parser
     private IExpression ParseBoolean()
     {
         return new ast.Boolean(CurToken, CurTokenIs(Constants.TRUE));
+    }
+
+    private IExpression ParseGroupedExpression()
+    {
+        NextToken();
+
+        var exp = ParseExpression((int)PrecedencesEnum.LOWEST);
+
+        if (ExpectPeek(Constants.RPAREN))
+        {
+            return null;
+        }
+
+        return exp;
+    }
+
+    private IExpression ParseIfExpression()
+    {
+        var expression = new IfExpression(CurToken);
+
+        if (ExpectPeek(Constants.LPAREN))
+        {
+            return null;
+        }
+
+        NextToken();
+
+        expression.Condition = ParseExpression((int)PrecedencesEnum.LOWEST);
+
+        if (!ExpectPeek(Constants.RPAREN))
+        {
+            return null;
+        }
+
+        if (!ExpectPeek(Constants.LBRACE))
+        {
+            return null;
+        }
+
+        expression.Consequence = ParseBlockStatement();
+
+        return expression;
+    }
+
+    private IStatement ParseBlockStatement()
+    {
+        var block = new BlockStatement(CurToken);
+        block.Statements = new IStatement[] {};
+
+        NextToken();
+
+        while(CurTokenIs(Constants.RBRACE) && !CurTokenIs(Constants.EOF))
+        {
+            var smt = ParseStatement();
+            if (smt != null)
+            {
+                block.Statements.Append(smt);
+            }
+            NextToken();
+        }
+
+        return block;
     }
 
     private bool CurTokenIs(string tokenType)

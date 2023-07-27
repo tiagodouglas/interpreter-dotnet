@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 namespace interpreter_dotnet.ast;
 
 internal class ExpressionStatement : IStatement
