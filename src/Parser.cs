@@ -57,6 +57,8 @@ namespace interpreter_dotnet
             RegisterPrefix(Constants.NOT_EQ, ParsePrefixExpression);
             RegisterPrefix(Constants.LT, ParsePrefixExpression);
             RegisterPrefix(Constants.GT, ParsePrefixExpression);
+            RegisterPrefix(Constants.TRUE, ParseBoolean);
+            RegisterPrefix(Constants.FALSE, ParseBoolean);
 
             NextToken();
             NextToken();
@@ -219,6 +221,11 @@ namespace interpreter_dotnet
             }
 
             return stmt;
+        }
+
+        private IExpression ParseBoolean()
+        {
+            return new ast.Boolean(CurToken, CurTokenIs(Constants.TRUE));
         }
 
         private bool CurTokenIs(string tokenType)
