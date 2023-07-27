@@ -61,6 +61,7 @@ internal class Parser
         RegisterPrefix(Constants.FALSE, ParseBoolean);
         RegisterPrefix(Constants.LPAREN, ParseGroupedExpression);
         RegisterPrefix(Constants.IF, ParseIfExpression);
+        RegisterPrefix(Constants.FUNCTION, ParseFunctionLiteral);
 
         NextToken();
         NextToken();
@@ -275,11 +276,11 @@ internal class Parser
     private IStatement ParseBlockStatement()
     {
         var block = new BlockStatement(CurToken);
-        block.Statements = new IStatement[] {};
+        block.Statements = new IStatement[] { };
 
         NextToken();
 
-        while(CurTokenIs(Constants.RBRACE) && !CurTokenIs(Constants.EOF))
+        while (CurTokenIs(Constants.RBRACE) && !CurTokenIs(Constants.EOF))
         {
             var smt = ParseStatement();
             if (smt != null)
@@ -290,6 +291,59 @@ internal class Parser
         }
 
         return block;
+    }
+
+    private IExpression ParseFunctionLiteral()
+    {
+        var lit = new FunctionLiteral(CurToken);
+
+        if (ExpectPeek(Constants.LPAREN))
+        {
+            return null;
+        }
+
+        lit.Parameters = ParseFunctionParameters();
+
+        if (ExpectPeek(Constants.LBRACE))
+        {
+            return null;
+        }
+
+        lit.Body = ParseBlockStatement();
+
+        return lit;
+    }
+
+    private Identifier[] ParseFunctionParameters()
+    {
+        var identifiers = new Identifier[] { };
+
+        if (PeekTokenIs(Constants.RPAREN))
+        {
+            NextToken();
+            return identifiers;
+        }
+
+        NextToken();
+
+        var ident = new Identifier(CurToken, CurToken.Literal);
+        identifiers.Append(ident);
+
+        while (PeekTokenIs(Constants.COMMA))
+        {
+            NextToken();
+            NextToken();
+
+            ident = new Identifier(CurToken, CurToken.Literal);
+            identifiers.Append(ident);
+        }
+
+        if (ExpectPeek(Constants.RPAREN))
+        {
+            return null;
+        }
+
+        return identifiers;
     }
 
     private bool CurTokenIs(string tokenType)
