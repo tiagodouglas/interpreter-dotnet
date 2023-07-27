@@ -1,34 +1,33 @@
 using System.Linq.Expressions;
-namespace interpreter_dotnet.ast
+namespace interpreter_dotnet.ast;
+
+internal class ExpressionStatement : IStatement
 {
-    internal class ExpressionStatement : IStatement
+    public Token Token { get; set; }
+    public IExpression Value { get; set; }
+
+    public ExpressionStatement(Token token)
     {
-        public Token Token { get; set; }
-        public IExpression Value { get; set; }
+        Token = token;
+    }
 
-        public ExpressionStatement(Token token)
+    public void StatementNode()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string String()
+    {
+        if (Value != null)
         {
-            Token = token;
+            return Value.String();
         }
 
-        public void StatementNode()
-        {
-            throw new NotImplementedException();
-        }
+        return string.Empty;
+    }
 
-        public string String()
-        {
-            if (Value != null)
-            {
-                return Value.String();
-            }
-
-            return string.Empty;
-        }
-
-        public string TokenLiteral()
-        {
-            return Token.Literal;
-        }
+    public string TokenLiteral()
+    {
+        return Token.Literal;
     }
 }

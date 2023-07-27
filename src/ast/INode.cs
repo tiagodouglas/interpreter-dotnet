@@ -1,8 +1,7 @@
-﻿namespace interpreter_dotnet.ast
+﻿namespace interpreter_dotnet.ast;
+
+internal interface INode
 {
-    internal interface INode
-    {
-        string TokenLiteral();
-        string String();
-    }
+    string TokenLiteral();
+    string String();
 }

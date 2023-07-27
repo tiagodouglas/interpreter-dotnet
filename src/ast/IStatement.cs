@@ -1,7 +1,6 @@
-﻿namespace interpreter_dotnet.ast
+﻿namespace interpreter_dotnet.ast;
+
+internal interface IStatement: INode
 {
-    internal interface IStatement: INode
-    {
-        void StatementNode();
-    }
+    void StatementNode();
 }

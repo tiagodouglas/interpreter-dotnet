@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace interpreter_dotnet
+﻿namespace interpreter_dotnet
 {
     internal class Lexer
     {

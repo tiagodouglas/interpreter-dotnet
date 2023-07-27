@@ -1,34 +1,33 @@
 ﻿using System.Text;
 
-namespace interpreter_dotnet.ast
+namespace interpreter_dotnet.ast;
+
+internal class ProgramCode
 {
-    internal class ProgramCode
+    public IStatement[]? Statements { get; set; }
+
+    public string TokenLiteral()
     {
-        public IStatement[]? Statements { get; set; }
-
-        public string TokenLiteral()
+        if (Statements?.Length > 0)
         {
-            if (Statements?.Length > 0)
-            {
-                return Statements[0].TokenLiteral();
-            }
-            else
-            {
-                return string.Empty;
-            }
+            return Statements[0].TokenLiteral();
         }
-
-        public string String()
+        else
         {
-            var output = new StringBuilder();
-
-            if (Statements != null)
-                foreach (var s in Statements)
-                {
-                    output.Append(s.String());
-                }
-
-            return output.ToString();
+            return string.Empty;
         }
+    }
+
+    public string String()
+    {
+        var output = new StringBuilder();
+
+        if (Statements != null)
+            foreach (var s in Statements)
+            {
+                output.Append(s.String());
+            }
+
+        return output.ToString();
     }
 }

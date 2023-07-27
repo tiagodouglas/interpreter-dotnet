@@ -1,43 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace interpreter_dotnet.ast
+namespace interpreter_dotnet.ast;
+
+internal class PrefixExpression: IExpression
 {
-    internal class PrefixExpression: IExpression
+    public Token Token { get; set; }
+    public string Operator { get; set; }
+    public IExpression Right { get; set; }
+
+    public PrefixExpression(Token token, string op)
     {
-        public Token Token { get; set; }
-        public string Operator { get; set; }
-        public IExpression Right { get; set; }
+        Token = token;
+        Operator = op;
+    }
 
-        public PrefixExpression(Token token, string op)
-        {
-            Token = token;
-            Operator = op;
-        }
+    public void ExpressionNode()
+    {
+        throw new NotImplementedException();
+    }
 
-        public void ExpressionNode()
-        {
-            throw new NotImplementedException();
-        }
+    public string String()
+    {
+         var output =  new StringBuilder();
 
-        public string String()
-        {
-             var output =  new StringBuilder();
+        output.Append("(");
+        output.Append(Operator);
+        output.Append(Right.String());
+        output.Append(")");
 
-            output.Append("(");
-            output.Append(Operator);
-            output.Append(Right.String());
-            output.Append(")");
+        return output.ToString();
+    }
 
-            return output.ToString();
-        }
-
-        public string TokenLiteral()
-        {
-            return Token.Literal;
-        }
+    public string TokenLiteral()
+    {
+        return Token.Literal;
     }
 }

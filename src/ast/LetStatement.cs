@@ -1,45 +1,44 @@
 ﻿using System.Text;
 
-namespace interpreter_dotnet.ast
+namespace interpreter_dotnet.ast;
+
+internal class LetStatement: IStatement
 {
-    internal class LetStatement: IStatement
+    public Token Token { get; set; }
+    public IExpression Value { get; set; }
+    public Identifier Name { get; set; }
+
+    public LetStatement(Token token)
     {
-        public Token Token { get; set; }
-        public IExpression Value { get; set; }
-        public Identifier Name { get; set; }
+        Token = token;
+        
+    }
 
-        public LetStatement(Token token)
+    public void StatementNode()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string String()
+    {
+        var output =  new StringBuilder();
+
+        output.Append(TokenLiteral() + " ");
+        output.Append(Name.ToString());
+        output.Append(" = ");
+
+        if (Value != null)
         {
-            Token = token;
-            
+            output.Append(Value.ToString());
         }
 
-        public void StatementNode()
-        {
-            throw new NotImplementedException();
-        }
+        output.Append(";");
+      
+        return output.ToString();
+    }
 
-        public string String()
-        {
-            var output =  new StringBuilder();
-
-            output.Append(TokenLiteral() + " ");
-            output.Append(Name.ToString());
-            output.Append(" = ");
-
-            if (Value != null)
-            {
-                output.Append(Value.ToString());
-            }
-
-            output.Append(";");
-          
-            return output.ToString();
-        }
-
-        public string TokenLiteral()
-        {
-            return Token.Literal;
-        }
+    public string TokenLiteral()
+    {
+        return Token.Literal;
     }
 }

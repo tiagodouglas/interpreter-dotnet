@@ -1,9 +1,8 @@
-﻿namespace interpreter_dotnet.ast
+﻿namespace interpreter_dotnet.ast;
+
+internal interface IExpression: INode
 {
-    internal interface IExpression: INode
-    {
-        void ExpressionNode();
-        string TokenLiteral();
-        string String();
-    }
+    void ExpressionNode();
+    string TokenLiteral();
+    string String();
 }
