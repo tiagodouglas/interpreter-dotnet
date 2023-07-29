@@ -48,6 +48,8 @@ internal class Parser
         Errors = new List<string>();
 
         PrefixParseFns = new Dictionary<string, PrefixParseFn>();
+        InfixParseFns = new Dictionary<string, InfixParseFn>();
+
         RegisterPrefix(Constants.IDENT, ParseIdentifier);
         RegisterPrefix(Constants.INT, ParseIntegerLiteral);
         RegisterPrefix(Constants.BANG, ParsePrefixExpression);
@@ -64,7 +66,6 @@ internal class Parser
         RegisterPrefix(Constants.FUNCTION, ParseFunctionLiteral);
 
         RegisterInfix(Constants.LPAREN, ParseCallExpression);
-        
 
         NextToken();
         NextToken();
@@ -73,7 +74,7 @@ internal class Parser
     public ProgramCode ParseProgram()
     {
         Program = new ProgramCode();
-        Program.Statements = new IStatement[] { };
+        Program.Statements = new List<IStatement> { };
 
         while (CurToken.Type != Constants.EOF)
         {
@@ -81,7 +82,7 @@ internal class Parser
 
             if (stmt != null)
             {
-                Program.Statements.Append(stmt);
+                Program.Statements.Add(stmt);
             }
 
             NextToken();
@@ -279,7 +280,7 @@ internal class Parser
     private IStatement ParseBlockStatement()
     {
         var block = new BlockStatement(CurToken);
-        block.Statements = new IStatement[] { };
+        block.Statements = new List<IStatement> { };
 
         NextToken();
 
@@ -288,7 +289,7 @@ internal class Parser
             var smt = ParseStatement();
             if (smt != null)
             {
-                block.Statements.Append(smt);
+                block.Statements.Add(smt);
             }
             NextToken();
         }
@@ -325,9 +326,9 @@ internal class Parser
         return exp;
     }
 
-    private IExpression[] ParseCallArguments()
+    private List<IExpression> ParseCallArguments()
     {
-        var args = new IExpression[] { };
+        var args = new List<IExpression> { };
 
         if (PeekTokenIs(Constants.RPAREN))
         {
@@ -337,13 +338,13 @@ internal class Parser
 
         NextToken();
 
-        args.Append(ParseExpression((int)PrecedencesEnum.LOWEST));
+        args.Add(ParseExpression((int)PrecedencesEnum.LOWEST));
 
         while (PeekTokenIs(Constants.COMMA))
         {
             NextToken();
             NextToken();
-            args.Append(ParseExpression((int)PrecedencesEnum.LOWEST));
+            args.Add(ParseExpression((int)PrecedencesEnum.LOWEST));
         }
 
         if (!ExpectPeek(Constants.RPAREN))
@@ -354,9 +355,9 @@ internal class Parser
         return args;
     }
 
-    private Identifier[] ParseFunctionParameters()
+    private List<IExpression> ParseFunctionParameters()
     {
-        var identifiers = new Identifier[] { };
+        var identifiers = new List<IExpression> { };
 
         if (PeekTokenIs(Constants.RPAREN))
         {
@@ -367,7 +368,7 @@ internal class Parser
         NextToken();
 
         var ident = new Identifier(CurToken, CurToken.Literal);
-        identifiers.Append(ident);
+        identifiers.Add(ident);
 
         while (PeekTokenIs(Constants.COMMA))
         {
@@ -375,7 +376,7 @@ internal class Parser
             NextToken();
 
             ident = new Identifier(CurToken, CurToken.Literal);
-            identifiers.Append(ident);
+            identifiers.Add(ident);
         }
 
         if (ExpectPeek(Constants.RPAREN))

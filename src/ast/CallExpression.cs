@@ -12,7 +12,7 @@ internal class CallExpression : IExpression
 
     public Token Token { get; set; }
     public IExpression Function { get; set; }
-    public IExpression[] Arguments { get; set; }
+    public List<IExpression> Arguments { get; set; }
 
     public void ExpressionNode()
     {

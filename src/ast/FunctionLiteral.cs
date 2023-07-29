@@ -10,7 +10,7 @@ internal class FunctionLiteral : IExpression
     }
 
     public Token Token { get; set; }
-    public IExpression[] Parameters { get; set; }
+    public List<IExpression?> Parameters { get; set; }
     public IStatement Body { get; set; }
 
 

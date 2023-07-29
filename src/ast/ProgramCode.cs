@@ -4,11 +4,11 @@ namespace interpreter_dotnet.ast;
 
 internal class ProgramCode
 {
-    public IStatement[]? Statements { get; set; }
+    public List<IStatement?> Statements { get; set; }
 
     public string TokenLiteral()
     {
-        if (Statements?.Length > 0)
+        if (Statements?.Count > 0)
         {
             return Statements[0].TokenLiteral();
         }

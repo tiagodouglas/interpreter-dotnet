@@ -27,9 +27,7 @@
                         ReadChar();
                         var literal = $"{ch}{Ch}";
 
-
                         token = new Token(Constants.EQ, literal);
-
                     }
                     else
                     {

@@ -10,7 +10,7 @@ internal class BlockStatement : IStatement
     }
 
     public Token Token { get; set; }
-    public IStatement[] Statements { get; set; }
+    public List<IStatement> Statements { get; set; }
 
     public void StatementNode()
     {
