@@ -4,7 +4,7 @@ namespace interpreter_dotnet;
 
 internal class Parser
 {
-    private enum PrecedencesEnum
+    private enum _precedencesEnum
     {
         _int,
         LOWEST,
@@ -16,17 +16,17 @@ internal class Parser
         CALL
     };
 
-    private Dictionary<string, int> Precedences = new Dictionary<string, int>
+    private readonly Dictionary<string, int> _precedences = new()
     {
-         {Constants.EQ, (int)PrecedencesEnum.EQUALS},
-         {Constants.NOT_EQ,(int) PrecedencesEnum.EQUALS},
-         {Constants.LT,(int) PrecedencesEnum.LESSGREATER},
-         {Constants.GT, (int)PrecedencesEnum.LESSGREATER},
-         {Constants.PLUS,(int) PrecedencesEnum.SUM},
-         {Constants.MINUS,(int) PrecedencesEnum.SUM},
-         {Constants.SLASH, (int)PrecedencesEnum.PRODUCT},
-         {Constants.ASTERISK,(int) PrecedencesEnum.PRODUCT},
-         {Constants.LPAREN,(int) PrecedencesEnum.CALL}
+         {Constants.EQ, (int)_precedencesEnum.EQUALS},
+         {Constants.NOT_EQ,(int) _precedencesEnum.EQUALS},
+         {Constants.LT,(int) _precedencesEnum.LESSGREATER},
+         {Constants.GT, (int)_precedencesEnum.LESSGREATER},
+         {Constants.PLUS,(int) _precedencesEnum.SUM},
+         {Constants.MINUS,(int) _precedencesEnum.SUM},
+         {Constants.SLASH, (int)_precedencesEnum.PRODUCT},
+         {Constants.ASTERISK,(int) _precedencesEnum.PRODUCT},
+         {Constants.LPAREN,(int) _precedencesEnum.CALL}
     };
 
     public delegate IExpression PrefixParseFn();
@@ -65,6 +65,9 @@ internal class Parser
         RegisterPrefix(Constants.IF, ParseIfExpression);
         RegisterPrefix(Constants.FUNCTION, ParseFunctionLiteral);
 
+        RegisterInfix(Constants.ASTERISK, ParseInfixExpreesion);
+        RegisterInfix(Constants.EQ, ParseInfixExpreesion);
+        RegisterInfix(Constants.NOT_EQ, ParseInfixExpreesion);
         RegisterInfix(Constants.LPAREN, ParseCallExpression);
 
         NextToken();
@@ -73,8 +76,10 @@ internal class Parser
 
     public ProgramCode ParseProgram()
     {
-        Program = new ProgramCode();
-        Program.Statements = new List<IStatement> { };
+        Program = new ProgramCode
+        {
+            Statements = new List<IStatement> { }
+        };
 
         while (CurToken.Type != Constants.EOF)
         {
@@ -111,7 +116,7 @@ internal class Parser
             case Constants.RETURN:
                 return ReturnStatement();
             default:
-                return null;
+                return ParseExpressionStatement();
         }
     }
 
@@ -131,13 +136,30 @@ internal class Parser
             return null;
         }
 
-        while (!CurTokenIs(Constants.SEMICOLON))
+        NextToken();
+
+        stmt.Value = ParseExpression((int)_precedencesEnum.LOWEST);
+
+        if (PeekTokenIs(Constants.SEMICOLON))
         {
             NextToken();
         }
 
         return stmt;
+    }
 
+    private IStatement ParseExpressionStatement()
+    {
+        var smt = new ExpressionStatement(CurToken);
+
+        smt.Expression = ParseExpression((int)_precedencesEnum.LOWEST);
+
+        if (PeekTokenIs(Constants.SEMICOLON))
+        {
+            NextToken();
+        }
+
+        return smt;
     }
 
     private IExpression ParseExpression(int precendence)
@@ -197,7 +219,7 @@ internal class Parser
 
         NextToken();
 
-        expression.Right = ParseExpression((int)PrecedencesEnum.PREFIX);
+        expression.Right = ParseExpression((int)_precedencesEnum.PREFIX);
 
         return expression;
     }
@@ -216,20 +238,6 @@ internal class Parser
         return stmt;
     }
 
-    private ExpressionStatement ExpressionStatement()
-    {
-        var stmt = new ExpressionStatement(CurToken);
-
-        stmt.Value = ParseExpression(((int)PrecedencesEnum.LOWEST));
-
-        if (PeekTokenIs(Constants.SEMICOLON))
-        {
-            NextToken();
-        }
-
-        return stmt;
-    }
-
     private IExpression ParseBoolean()
     {
         return new ast.Boolean(CurToken, CurTokenIs(Constants.TRUE));
@@ -239,7 +247,7 @@ internal class Parser
     {
         NextToken();
 
-        var exp = ParseExpression((int)PrecedencesEnum.LOWEST);
+        var exp = ParseExpression((int)_precedencesEnum.LOWEST);
 
         if (ExpectPeek(Constants.RPAREN))
         {
@@ -260,7 +268,7 @@ internal class Parser
 
         NextToken();
 
-        expression.Condition = ParseExpression((int)PrecedencesEnum.LOWEST);
+        expression.Condition = ParseExpression((int)_precedencesEnum.LOWEST);
 
         if (!ExpectPeek(Constants.RPAREN))
         {
@@ -338,13 +346,13 @@ internal class Parser
 
         NextToken();
 
-        args.Add(ParseExpression((int)PrecedencesEnum.LOWEST));
+        args.Add(ParseExpression((int)_precedencesEnum.LOWEST));
 
         while (PeekTokenIs(Constants.COMMA))
         {
             NextToken();
             NextToken();
-            args.Add(ParseExpression((int)PrecedencesEnum.LOWEST));
+            args.Add(ParseExpression((int)_precedencesEnum.LOWEST));
         }
 
         if (!ExpectPeek(Constants.RPAREN))
@@ -414,26 +422,26 @@ internal class Parser
 
     private int PeekPrecedence()
     {
-        var precendence = Precedences[PeekToken.Type];
+        var precendence = _precedences[PeekToken.Type];
 
         if (precendence != default)
         {
             return precendence;
         }
 
-        return (int)PrecedencesEnum.LOWEST;
+        return (int)_precedencesEnum.LOWEST;
     }
 
     private int CurPrecedence()
     {
-        var precendence = Precedences[CurToken.Type];
+        var precendence = _precedences[CurToken.Type];
 
         if (precendence != default)
         {
             return precendence;
         }
 
-        return (int)PrecedencesEnum.LOWEST;
+        return (int)_precedencesEnum.LOWEST;
     }
 
     private void NextToken()
@@ -468,29 +476,8 @@ internal class Parser
 
         var precendence = CurPrecedence();
         NextToken();
-
-        if (expression.Operator == "+")
-        {
-            expression.Right = ParseExpression(precendence - 1);
-        }
-        else
-        {
-            expression.Right = ParseExpression(precendence);
-        }
+        expression.Right = ParseExpression(precendence);
 
         return expression;
-    }
-
-    private void ParseExpression()
-    {
-        try
-        {
-            ParserTracing.Trace("parseExpressionStatement");
-        }
-        finally
-        {
-            ParserTracing.Untrace("parseExpressionStatement");
-        }
-
     }
 }

@@ -10,22 +10,25 @@ internal class Program
             Console.Write(">> ");
             var line = Console.ReadLine();
 
-            var lexer = new Lexer(line);
-            var parser = new Parser(lexer);
-
-            var program = parser.ParseProgram();
-
-            if (parser.Errors.Count != 0)
+            if (line != null)
             {
-                PrintParserErrors(parser.GetErrors());
-                continue;
-            }
+                var lexer = new Lexer(line);
+                var parser = new Parser(lexer);
 
-            Console.WriteLine(program.String());
+                var program = parser.ParseProgram();
 
-            for (var tok = lexer.NextToken(); tok.Type != Constants.EOF; tok = lexer.NextToken())
-            {
-                Console.WriteLine(tok.Type);
+                if (parser.Errors.Count != 0)
+                {
+                    PrintParserErrors(parser.GetErrors());
+                    continue;
+                }
+
+                Console.WriteLine(program.String());
+
+                for (var tok = lexer.NextToken(); tok.Type != Constants.EOF; tok = lexer.NextToken())
+                {
+                    Console.WriteLine(tok.Type);
+                }
             }
         }
     }

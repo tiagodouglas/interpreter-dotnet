@@ -3,7 +3,7 @@ namespace interpreter_dotnet.ast;
 internal class ExpressionStatement : IStatement
 {
     public Token Token { get; set; }
-    public IExpression Value { get; set; }
+    public IExpression Expression { get; set; }
 
     public ExpressionStatement(Token token)
     {
@@ -17,9 +17,9 @@ internal class ExpressionStatement : IStatement
 
     public string String()
     {
-        if (Value != null)
+        if (Expression != null)
         {
-            return Value.String();
+            return Expression.String();
         }
 
         return string.Empty;

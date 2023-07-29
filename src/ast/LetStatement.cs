@@ -11,12 +11,10 @@ internal class LetStatement: IStatement
     public LetStatement(Token token)
     {
         Token = token;
-        
     }
 
     public void StatementNode()
     {
-        throw new NotImplementedException();
     }
 
     public string String()
@@ -29,7 +27,7 @@ internal class LetStatement: IStatement
 
         if (Value != null)
         {
-            output.Append(Value.ToString());
+            output.Append(Value.String());
         }
 
         output.Append(";");

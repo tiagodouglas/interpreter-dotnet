@@ -5,9 +5,19 @@ internal class Token
     public string? Type { get; set; }
     public string? Literal { get; set; }
 
+    private readonly Dictionary<string, string> _keywords = new()
+    {
+        { "fn", Constants.FUNCTION },
+        { "let", Constants.LET },
+        { "true", Constants.TRUE },
+        { "false", Constants.FALSE },
+        { "if", Constants.IF },
+        { "else", Constants.ELSE },
+        { "return", Constants.RETURN }
+    };
+
     public Token()
     {
-
     }
 
     public Token(string? tokenType, string? literal)
@@ -18,19 +28,11 @@ internal class Token
 
     public string LookupIdent(string ident)
     {
-        var keywords = new Dictionary<string, string>
+        if (_keywords.TryGetValue(ident, out var tok))
         {
-            { "fn", Constants.FUNCTION },
-            { "let", Constants.LET},
-            { "true", Constants.TRUE},
-            { "false", Constants.FALSE },
-            { "if", Constants.IF},
-            { "else", Constants.ELSE},
-            { "return", Constants.RETURN }
-        };
+            return tok;
+        }
 
-        var result = keywords.FirstOrDefault(x => x.Key == ident);
-
-        return string.IsNullOrEmpty(result.Value) ? Constants.IDENT : result.Value;
+        return Constants.IDENT;
     }
 }

@@ -18,7 +18,6 @@ internal class InfixExpression : IExpression
 
     public void ExpressionNode()
     {
-        throw new NotImplementedException();
     }
 
     public string String()
