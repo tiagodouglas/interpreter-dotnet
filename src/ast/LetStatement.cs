@@ -24,7 +24,7 @@ internal class LetStatement: IStatement
         var output =  new StringBuilder();
 
         output.Append(TokenLiteral() + " ");
-        output.Append(Name.ToString());
+        output.Append(Name.String());
         output.Append(" = ");
 
         if (Value != null)
